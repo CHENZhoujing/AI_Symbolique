@@ -77,4 +77,42 @@ next(libre(X)) :- does(robot, move(Y, Z)) & true(sur(Y, X))
                         true(sur(d, c)) &
                         true(sur(e, d)) &
                         true(sur(f, e))
-                        
+
+#Un appartement comporte un salon, une cuisine et un placart ces trois pièces sont reliées deux à deux.
+#Un singe se trouve dans le salon et un régime de bananes est accroché au plafond de la cuisine.
+#Une caisse est posée au sol dans le placard.
+#Trouver une suite d'actions du singe affamé pour attraper les bananes sechant que pour atteindre son but il doit monter sur la caisse.
+
+#Aller dans la placard
+#Prendre la caisse
+#Aller dans la cuisine avec la caisse
+#Monter sur la caisse
+#Attraper les bananes
+
+#Ecrire la base de faits initiale sachant que le singe se nomme cheeta, la caisse ks et le régime de bananes split.
+#Décrire le problème en GDL.
+
+init(dans(cheeta, salon))
+init(dans(ks, placard))
+init(dans(split, cuisine))
+
+move(salon, placard)
+move(placard, salon)
+move(salon, cuisine)
+move(cuisine, salon)
+move(placard, cuisine)
+move(cuisine, placard)
+
+legal(cheeta, aller(X)) :- true(dans(cheeta,Y)) & move(Y, X)
+legal(cheeta, prend(ks)) :- true(dans(cheeta, X)) & true(dans(ks, X))
+legal(cheeta, attrape(split)) :- true(prise(ks)) & true(dans(cheeta, X)) & true(dans(ks, X))
+
+next(dans(cheeta, X)) :- does(cheeta, aller(X))
+next(dans(cheeta, X)) :- true(dans(cheeta, X)) & not does(cheeta, aller(Y))
+next(prise(ks)) :- does(cheeta, prend(ks))
+next(prise(ks)) :- true(prend(ks))
+next(manger(split)) :- does(cheeta, attrape(split))
+next(dans(ks, placard)) :- not does(cheeta, prend(ks)) & true(dans(ks, placard))
+next(dans(split, placard)) :- true(dans(split, cuisine)) & not does(cheeta, attrape(split))
+
+goal(cheeta, 100) :- true(manger(split))
